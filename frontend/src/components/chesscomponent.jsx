@@ -9,6 +9,9 @@ const ChessboardComponent = () => {
   const [allowMyself, setAllowMyself] = useState(false)
   const [orientation, setOrientation] = useState("white")
   const [position, setPosition] = useState("start")
+  const [gameOver, setGameOver] = useState(false)
+  const [winner, setWinner] = useState("")
+  const [result, setResult] = useState("")
 
 
   const [remoteSocketId, setRemotesocketId] = useState()
@@ -128,21 +131,60 @@ const ChessboardComponent = () => {
     [],
   )
 
+  const handleOpponentGameEnd = useCallback(
+    ({ from, source, target, piece, newPos, oldPos, gameStatus }) => {
+      // board.position(newPos)
+      setPosition(newPos)
+      setGameOver(true);
+      setResult(gameStatus)
+      if(gameStatus == "Checkmate")
+      {
+        setWinner("You Lose")
+      }
+      else
+      {
+        setWinner("Draw")
+      }
+    },
+    [],
+  )
+
+  const handleGameEnd = useCallback(
+    ({gameStatus }) => {
+      setGameOver(true);
+      setResult(gameStatus)
+      if(gameStatus == "Checkmate")
+      {
+        setWinner("You Win")
+      }
+      else
+      {
+        setWinner("Draw")
+      }
+    },
+    [],
+  )
+
 
   useEffect(() => {
     socket.on("newUserJoined", handleUserJoined)
     socket.on("user:inroom", handleInRoomUser);
     socket.on("opponent:move", handleOpponentMove);
+    socket.on("opponent:move:gameend", handleOpponentGameEnd);
+    socket.on("gameend", handleGameEnd);
     return () => {
       socket.off("newUserJoined", handleUserJoined)
       socket.off("user:inroom", handleInRoomUser);
       socket.off("opponent:move", handleOpponentMove);
+      socket.off("opponent:move:gameend", handleOpponentGameEnd);
+      socket.off("gameend", handleGameEnd);
     }
-  }, [handleUserJoined, handleInRoomUser, handleOpponentMove])
+  }, [handleUserJoined, handleInRoomUser, handleOpponentMove,handleOpponentGameEnd, handleGameEnd])
   return (
     <div>
       <div ref={boardRef} style={{ width: "400px" }}></div>
       <p>{remoteSocketId},{remoteUsername},{orientation},{allowMyself ? "Allowed" : "Not Allowed"}</p>
+      <p>{gameOver? "Game Over" : "Game On"},{winner},{result}</p>
     </div>
   )
 }

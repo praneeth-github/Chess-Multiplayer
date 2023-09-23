@@ -165,6 +165,16 @@ const ChessboardComponent = () => {
     [],
   )
 
+  const handleInvalidMove = useCallback(
+    ({source, target, piece, newPos, oldPos}) => {
+      // board.position(newPos)
+      alert("Invalid Move");
+      setPosition(oldPos)
+      setAllowMyself(true)
+    },
+    [],
+  )
+
 
   useEffect(() => {
     socket.on("newUserJoined", handleUserJoined)
@@ -172,14 +182,16 @@ const ChessboardComponent = () => {
     socket.on("opponent:move", handleOpponentMove);
     socket.on("opponent:move:gameend", handleOpponentGameEnd);
     socket.on("gameend", handleGameEnd);
+    socket.on("invalid:move", handleInvalidMove);
     return () => {
       socket.off("newUserJoined", handleUserJoined)
       socket.off("user:inroom", handleInRoomUser);
       socket.off("opponent:move", handleOpponentMove);
       socket.off("opponent:move:gameend", handleOpponentGameEnd);
       socket.off("gameend", handleGameEnd);
+      socket.off("invalid:move", handleInvalidMove);
     }
-  }, [handleUserJoined, handleInRoomUser, handleOpponentMove,handleOpponentGameEnd, handleGameEnd])
+  }, [handleUserJoined, handleInRoomUser, handleOpponentMove,handleOpponentGameEnd, handleGameEnd, handleInvalidMove])
   return (
     <div>
       <div ref={boardRef} style={{ width: "400px" }}></div>

@@ -55,30 +55,61 @@ io.on("connection", (socket) => {
         move = piece + source + "-" + target;
         console.log(move);
         const chess = roomIdToChessGame.get(socketIdToRoomId.get(socket.id));
-        chess.move(move);
-        if(chess.isGameOver())
-        {
-            let gameStatus = "";
-            if(chess.isCheckmate())
+        try {
+            chess.move(move);
+            if(chess.isGameOver())
             {
-                gameStatus = "Checkmate";
-            }
-            else if(chess.isDraw() || chess.isThreefoldRepetition())
-            {
-                gameStatus = "Draw"
-            }
-            else if(chess.Stalemate())
-            {
-                gameStatus = "Stalemate"
-            }
+                let gameStatus = "";
+                if(chess.isCheckmate())
+                {
+                    gameStatus = "Checkmate";
+                }
+                else if(chess.isDraw() || chess.isThreefoldRepetition())
+                {
+                    gameStatus = "Draw"
+                }
+                else if(chess.Stalemate())
+                {
+                    gameStatus = "Stalemate"
+                }
 
-            io.to(to).emit("opponent:move:gameend",{from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, gameStatus: gameStatus})
-            io.to(socket.id).emit("gameend", {gameStatus: gameStatus})
+                io.to(to).emit("opponent:move:gameend",{from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, gameStatus: gameStatus})
+                io.to(socket.id).emit("gameend", {gameStatus: gameStatus})
+            }
+            else
+            {
+                io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos })
+            }
+        } catch (error) {
+            console.log("hi Error: ",error);
+            io.to(socket.id).emit("invalid:move",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos})
         }
-        else
-        {
-            io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos })
-        }
+        // console.log(move);
+        // const chess = roomIdToChessGame.get(socketIdToRoomId.get(socket.id));
+        // chess.move(move);
+        // if(chess.isGameOver())
+        // {
+        //     let gameStatus = "";
+        //     if(chess.isCheckmate())
+        //     {
+        //         gameStatus = "Checkmate";
+        //     }
+        //     else if(chess.isDraw() || chess.isThreefoldRepetition())
+        //     {
+        //         gameStatus = "Draw"
+        //     }
+        //     else if(chess.Stalemate())
+        //     {
+        //         gameStatus = "Stalemate"
+        //     }
+
+        //     io.to(to).emit("opponent:move:gameend",{from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, gameStatus: gameStatus})
+        //     io.to(socket.id).emit("gameend", {gameStatus: gameStatus})
+        // }
+        // else
+        // {
+        //     io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos })
+        // }
 
     })
 

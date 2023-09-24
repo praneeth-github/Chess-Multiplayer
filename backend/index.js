@@ -89,16 +89,16 @@ io.on("connection", (socket) => {
             {
                 console.log(moveConfirm.promotion)
                 // console.log("promotion")
-                let promoteId = "";
-                socketIdToRoomId.forEach((values,keys) => {
-                    // console.log("outside",values,keys)
-                    if(values == socketIdToRoomId.get(socket.id) && keys != socket.id)
-                    {
-                        // console.log("inside",values,keys);
-                        promoteId = keys;
-                    }
-                })
-                io.to(socket.id).emit("promotionPiece",{promoteId: promoteId, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos})
+                // let promoteId = "";
+                // socketIdToRoomId.forEach((values,keys) => {
+                //     // console.log("outside",values,keys)
+                //     if(values == socketIdToRoomId.get(socket.id) && keys != socket.id)
+                //     {
+                //         // console.log("inside",values,keys);
+                //         promoteId = keys;
+                //     }
+                // })
+                io.to(socket.id).emit("promotionPiece",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos})
             }
             else
             {

@@ -226,14 +226,14 @@ const ChessboardComponent = () => {
   // )
 
   const handleAskPromotionPiece = useCallback(
-    ({promoteId, source, target, piece, newPos, oldPos}) => {
+    ({source, target, piece, newPos, oldPos}) => {
       //Q,K,B,R
       const promotePiece = prompt("Please Enter the Promote Piece (Queen(Q), Knight(K), Bishop(B), Rook(R)","Q")
-      console.log(orientation,allowMyself)
-      console.log(remoteSocketId)
-      socket.emit("selectedPromotePiece",{to: promoteId, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, promotePiece: promotePiece})
+      // console.log(orientation,allowMyself)
+      // console.log(remoteSocketId)
+      socket.emit("selectedPromotePiece",{to: remoteSocketId, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, promotePiece: promotePiece})
     },
-    [],
+    [remoteSocketId],
   )
 
   // const handleOpponentAfterPromotion = useCallback(

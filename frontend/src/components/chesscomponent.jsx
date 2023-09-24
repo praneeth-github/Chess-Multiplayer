@@ -157,6 +157,7 @@ const ChessboardComponent = () => {
 
   const handleOpponentMove = useCallback(
     ({ from, source, target, piece, newPos, oldPos }) => {
+      // console.log("psjkdnjksd",newPos);
       // board.position(newPos)
       setPosition(newPos)
       setAllowMyself(true)
@@ -224,6 +225,27 @@ const ChessboardComponent = () => {
   //   [],
   // )
 
+  const handleAskPromotionPiece = useCallback(
+    ({promoteId, source, target, piece, newPos, oldPos}) => {
+      //Q,K,B,R
+      const promotePiece = prompt("Please Enter the Promote Piece (Queen(Q), Knight(K), Bishop(B), Rook(R)","Q")
+      console.log(orientation,allowMyself)
+      console.log(remoteSocketId)
+      socket.emit("selectedPromotePiece",{to: promoteId, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, promotePiece: promotePiece})
+    },
+    [],
+  )
+
+  // const handleOpponentAfterPromotion = useCallback(
+  //   ({ from, source, target, piece, newPos, oldPos }) => {
+  //     console.log("psjkdnjksd",newPos);
+  //     // board.position(newPos)
+  //     setPosition(newPos)
+  //     setAllowMyself(true)
+  //   },
+  //   [],
+  // )
+
 
   useEffect(() => {
     socket.on("newUserJoined", handleUserJoined)
@@ -234,6 +256,9 @@ const ChessboardComponent = () => {
     socket.on("invalid:move", handleInvalidMove);
     socket.on("castle:enpassant", handleCastleEnpassant);
     // socket.on("longCastle", handleLongCastle);
+    socket.on("promotionPiece", handleAskPromotionPiece);
+    // socket.on("afterPromotion", handleAfterPromotion);
+    // socket.on("opponent:move:afterPromotion", handleOpponentAfterPromotion);
     return () => {
       socket.off("newUserJoined", handleUserJoined)
       socket.off("user:inroom", handleInRoomUser);
@@ -243,13 +268,19 @@ const ChessboardComponent = () => {
       socket.off("invalid:move", handleInvalidMove);
       socket.off("castle:enpassant", handleCastleEnpassant);
       // socket.off("longCastle", handleLongCastle);
+      socket.off("promotionPiece", handleAskPromotionPiece);
+      // socket.off("afterPromotion", handleAfterPromotion);
+      // socket.off("opponent:move:afterPromotion", handleOpponentAfterPromotion);
     }
-  }, [handleUserJoined, handleInRoomUser, handleOpponentMove,handleOpponentGameEnd, handleGameEnd, handleInvalidMove, handleCastleEnpassant])
+  }, [handleUserJoined, handleInRoomUser, handleOpponentMove,handleOpponentGameEnd, handleGameEnd, handleInvalidMove, handleCastleEnpassant, handleAskPromotionPiece])
   return (
     <div>
+      <b>Oppponent: {remoteUsername}</b>
+      <p/>
       <div ref={boardRef} style={{ width: "400px" }}></div>
-      <p>{remoteSocketId},{remoteUsername},{orientation},{allowMyself ? "Allowed" : "Not Allowed"}</p>
-      <p>{gameOver? "Game Over" : "Game On"},{winner},{result}</p>
+      <p>{allowMyself ? "Your Turn" : (gameOver? "" : "Waiting for opponent")}</p>
+      <p>{gameOver? "Game Over" : ""}</p>
+      <p>{winner}  {result}</p>
     </div>
   )
 }

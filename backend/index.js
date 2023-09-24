@@ -24,6 +24,7 @@ io.on("connection", (socket) => {
         io.to(roomId).emit("newUserJoined", { username, id: socket.id });
         socket.join(roomId);
         socketIdToRoomId.set(socket.id, roomId);
+        // console.log("joined",socket.id, roomId);
         const chess = new Chess()
         roomIdToChessGame.set(roomId, chess)
     })
@@ -51,7 +52,7 @@ io.on("connection", (socket) => {
     //     chess.move("bQd8-h4")
     //     chess.move("wPd6-d7")
     //     chess.move("bKe8-e7")
-    //     const k = chess.move("wPd7-d8=Q")
+    //     const k = chess.move("wPd7-d8")
     //     console.log(w)
     //     console.log(q)
     //     console.log(k)
@@ -84,6 +85,21 @@ io.on("connection", (socket) => {
             //     io.to(socket.id).emit("castle",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, newnewPos: moveConfirm.after})
             //     io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos })
             // }
+            else if(moveConfirm.promotion != undefined)
+            {
+                console.log(moveConfirm.promotion)
+                // console.log("promotion")
+                let promoteId = "";
+                socketIdToRoomId.forEach((values,keys) => {
+                    // console.log("outside",values,keys)
+                    if(values == socketIdToRoomId.get(socket.id) && keys != socket.id)
+                    {
+                        // console.log("inside",values,keys);
+                        promoteId = keys;
+                    }
+                })
+                io.to(socket.id).emit("promotionPiece",{promoteId: promoteId, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos})
+            }
             else
             {
                 if(chess.isGameOver())
@@ -147,4 +163,44 @@ io.on("connection", (socket) => {
     //     io.to(to).emit("opponent:move", { from: socket.id, newPos: newPos, oldPos: oldPos })
     // })
 
+    socket.on("selectedPromotePiece",({to, source, target, piece, newPos, oldPos, promotePiece}) => {
+        console.log("server",to)
+        move = piece + source + "-" + target + "=" + promotePiece;
+        console.log(move);
+        const chess = roomIdToChessGame.get(socketIdToRoomId.get(socket.id));
+        chess.undo();
+        try {
+            const moveConfirm = chess.move(move);
+            io.to(socket.id).emit("castle:enpassant", {newnewPos: moveConfirm.after})
+            console.log("helllo wokring1")
+            if(chess.isGameOver())
+            {
+                let gameStatus = "";
+                if(chess.isCheckmate())
+                {
+                    gameStatus = "Checkmate";
+                }
+                else if(chess.isDraw() || chess.isThreefoldRepetition() || chess.isInsufficientMaterial())
+                {
+                    gameStatus = "Draw"
+                }
+                else if(chess.Stalemate())
+                {
+                    gameStatus = "Stalemate"
+                }
+                console.log("helllo wokring2")
+                io.to(to).emit("opponent:move:gameend",{from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, gameStatus: gameStatus})
+                io.to(socket.id).emit("gameend", {gameStatus: gameStatus})
+            }
+            else
+            {
+                console.log("helllo wokring3",moveConfirm.after)
+                console.log(to)
+                io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos })
+            }
+        } catch (error) {
+            console.log("hi Error: ",error);
+            io.to(socket.id).emit("invalid:move",{source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos})
+        }
+    })
 })

@@ -12,8 +12,8 @@ const ChessboardComponent = () => {
   const [gameOver, setGameOver] = useState(false)
   const [winner, setWinner] = useState("")
   const [result, setResult] = useState("")
-  const [isCastle, setIsCastle] = useState(false)
-  const [isLongCastle, setIsLongCastle] = useState(false)
+  // const [isCastle, setIsCastle] = useState(false)
+  // const [isLongCastle, setIsLongCastle] = useState(false)
 
 
   const [remoteSocketId, setRemotesocketId] = useState()
@@ -54,7 +54,7 @@ const ChessboardComponent = () => {
     console.log('Old position: ' + Chessboard.objToFen(oldPos))
     console.log('New position: ' + Chessboard.objToFen(newPos))
     console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-    socket.emit("user:move:castle",{to: remoteSocketId, newPos: newPos, oldPos: oldPos})
+    // socket.emit("user:move:castle",{to: remoteSocketId, newPos: newPos, oldPos: oldPos})
   }
 
   function onDrop(source, target, piece, newPos, oldPos, orientation) {
@@ -101,37 +101,37 @@ const ChessboardComponent = () => {
 
   useEffect(() => {
     const board = Chessboard(boardRef.current, config);
-    console.log("castle: ",isCastle)
+    // console.log("castle: ",isCastle)
 
-    if(isCastle)
-    {
-      if(orientation == "white")
-      {
-        console.log("white castling")
-        board.move("h1-f1")
-      }
-      else
-      {
-        console.log("black castling")
-        board.move("h8-f8")
-      }
-      setIsCastle(false)
-    }
+    // if(isCastle)
+    // {
+    //   if(orientation == "white")
+    //   {
+    //     console.log("white castling")
+    //     board.move("h1-f1")
+    //   }
+    //   else
+    //   {
+    //     console.log("black castling")
+    //     board.move("h8-f8")
+    //   }
+    //   setIsCastle(false)
+    // }
 
-    if(isLongCastle)
-    {
-      if(orientation == "white")
-      {
-        console.log("white long castling")
-        board.move("a1-d1")
-      }
-      else
-      {
-        console.log("black long castling")
-        board.move("a8-d8")
-      }
-      setIsLongCastle(false)
-    }
+    // if(isLongCastle)
+    // {
+    //   if(orientation == "white")
+    //   {
+    //     console.log("white long castling")
+    //     board.move("a1-d1")
+    //   }
+    //   else
+    //   {
+    //     console.log("black long castling")
+    //     board.move("a8-d8")
+    //   }
+    //   setIsLongCastle(false)
+    // }
 
     return () => {
       board.destroy();
@@ -209,20 +209,20 @@ const ChessboardComponent = () => {
   )
 
   const handleCastle = useCallback(
-    ({source, target, piece, newPos, oldPos}) => {
-      setIsCastle(true);
-      setPosition(newPos);
+    ({source, target, piece, newPos, oldPos, newnewPos}) => {
+      // setIsCastle(true);
+      setPosition(newnewPos);
     },
     [],
   )
 
-  const handleLongCastle = useCallback(
-    ({source, target, piece, newPos, oldPos}) => {
-      setIsLongCastle(true);
-      setPosition(newPos);
-    },
-    [],
-  )
+  // const handleLongCastle = useCallback(
+  //   ({source, target, piece, newPos, oldPos}) => {
+  //     setIsLongCastle(true);
+  //     setPosition(newPos);
+  //   },
+  //   [],
+  // )
 
 
   useEffect(() => {
@@ -233,7 +233,7 @@ const ChessboardComponent = () => {
     socket.on("gameend", handleGameEnd);
     socket.on("invalid:move", handleInvalidMove);
     socket.on("castle", handleCastle);
-    socket.on("longCastle", handleLongCastle);
+    // socket.on("longCastle", handleLongCastle);
     return () => {
       socket.off("newUserJoined", handleUserJoined)
       socket.off("user:inroom", handleInRoomUser);
@@ -242,13 +242,13 @@ const ChessboardComponent = () => {
       socket.off("gameend", handleGameEnd);
       socket.off("invalid:move", handleInvalidMove);
       socket.off("castle", handleCastle);
-      socket.off("longCastle", handleLongCastle);
+      // socket.off("longCastle", handleLongCastle);
     }
-  }, [handleUserJoined, handleInRoomUser, handleOpponentMove,handleOpponentGameEnd, handleGameEnd, handleInvalidMove, handleCastle, handleLongCastle])
+  }, [handleUserJoined, handleInRoomUser, handleOpponentMove,handleOpponentGameEnd, handleGameEnd, handleInvalidMove, handleCastle])
   return (
     <div>
       <div ref={boardRef} style={{ width: "400px" }}></div>
-      <p>{remoteSocketId},{remoteUsername},{orientation},{isCastle? "Castle":""},{isLongCastle? "Long Castle":""},{allowMyself ? "Allowed" : "Not Allowed"}</p>
+      <p>{remoteSocketId},{remoteUsername},{orientation},{allowMyself ? "Allowed" : "Not Allowed"}</p>
       <p>{gameOver? "Game Over" : "Game On"},{winner},{result}</p>
     </div>
   )

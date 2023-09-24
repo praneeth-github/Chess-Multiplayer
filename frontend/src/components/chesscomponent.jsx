@@ -208,7 +208,7 @@ const ChessboardComponent = () => {
     [],
   )
 
-  const handleCastle = useCallback(
+  const handleCastleEnpassant = useCallback(
     ({source, target, piece, newPos, oldPos, newnewPos}) => {
       // setIsCastle(true);
       setPosition(newnewPos);
@@ -232,7 +232,7 @@ const ChessboardComponent = () => {
     socket.on("opponent:move:gameend", handleOpponentGameEnd);
     socket.on("gameend", handleGameEnd);
     socket.on("invalid:move", handleInvalidMove);
-    socket.on("castle", handleCastle);
+    socket.on("castle:enpassant", handleCastleEnpassant);
     // socket.on("longCastle", handleLongCastle);
     return () => {
       socket.off("newUserJoined", handleUserJoined)
@@ -241,10 +241,10 @@ const ChessboardComponent = () => {
       socket.off("opponent:move:gameend", handleOpponentGameEnd);
       socket.off("gameend", handleGameEnd);
       socket.off("invalid:move", handleInvalidMove);
-      socket.off("castle", handleCastle);
+      socket.off("castle:enpassant", handleCastleEnpassant);
       // socket.off("longCastle", handleLongCastle);
     }
-  }, [handleUserJoined, handleInRoomUser, handleOpponentMove,handleOpponentGameEnd, handleGameEnd, handleInvalidMove, handleCastle])
+  }, [handleUserJoined, handleInRoomUser, handleOpponentMove,handleOpponentGameEnd, handleGameEnd, handleInvalidMove, handleCastleEnpassant])
   return (
     <div>
       <div ref={boardRef} style={{ width: "400px" }}></div>

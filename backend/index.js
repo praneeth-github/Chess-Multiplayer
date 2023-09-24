@@ -70,14 +70,19 @@ io.on("connection", (socket) => {
         const chess = roomIdToChessGame.get(socketIdToRoomId.get(socket.id));
         try {
             const moveConfirm = chess.move(move);
-            if(moveConfirm.san == "O-O" || moveConfirm.san == "O-O-O")
+            if(moveConfirm.san == "O-O" || moveConfirm.san == "O-O-O" || moveConfirm.flags == "e")
             {
-                io.to(socket.id).emit("castle",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, newnewPos: moveConfirm.after})
+                io.to(socket.id).emit("castle:enpassant",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, newnewPos: moveConfirm.after})
                 io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos })
             }
             // else if(moveConfirm.san == "O-O-O")
             // {
             //     io.to(socket.id).emit("longCastle",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos})
+            // }
+            // else if(moveConfirm.flags == "e")
+            // {
+            //     io.to(socket.id).emit("castle",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, newnewPos: moveConfirm.after})
+            //     io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos })
             // }
             else
             {

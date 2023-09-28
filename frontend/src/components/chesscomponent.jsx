@@ -404,11 +404,9 @@ const ChessboardComponent = () => {
     handleOpponentRejectUndo, handleUpdatePgn, handleCantUndo])
   return (
     <div>
-      <p>{pgn}</p>
-      <p/>
       <b>Oppponent: {remoteUsername}</b>
       <p/>
-      <div ref={boardRef} style={{ width: "400px" }}></div>
+      <div ref={boardRef} style={{ margin: "auto", padding: "10px", width: "400px"}}></div>
       <p/>
       <button onClick={handleRequestUndo}>Undo</button>
       <button onClick={handleRequestDraw}>Request for a Draw</button>
@@ -416,6 +414,7 @@ const ChessboardComponent = () => {
       <p>{allowMyself ? "Your Turn" : (gameOver? "" : "Waiting for opponent")}</p>
       <p>{gameOver? "Game Over" : ""}</p>
       <p>{winner}  {result}</p>
+      <p>{pgn}</p>
     </div>
   )
 }

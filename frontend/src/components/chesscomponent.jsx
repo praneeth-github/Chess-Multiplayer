@@ -408,9 +408,9 @@ const ChessboardComponent = () => {
       <p/>
       <div ref={boardRef} style={{ margin: "auto", padding: "10px", width: "400px"}}></div>
       <p/>
-      <button onClick={handleRequestUndo}>Undo</button>
-      <button onClick={handleRequestDraw}>Request for a Draw</button>
-      <button onClick={handleResign}>Resign</button>
+      <button disabled={gameOver} onClick={handleRequestUndo}>Undo</button>
+      <button disabled={gameOver} onClick={handleRequestDraw}>Request for a Draw</button>
+      <button disabled={gameOver} onClick={handleResign}>Resign</button>
       <p>{allowMyself ? "Your Turn" : (gameOver? "" : "Waiting for opponent")}</p>
       <p>{gameOver? "Game Over" : ""}</p>
       <p>{winner}  {result}</p>

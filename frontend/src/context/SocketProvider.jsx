@@ -11,7 +11,7 @@ export const useSocket = () => {
 export const SocketProvider = (props) => {
     const socket = useMemo(() => io(
         "https://chess-multiplayer-nsiz.onrender.com"
-        //"localhost:8000"
+        // "localhost:8000"
     ), []);
 
     return (

@@ -40,28 +40,29 @@ io.on("connection", (socket) => {
     // // while (!chess.isGameOver()) {
     //     // const moves = chess.moves()
     //     // const move = moves[Math.floor(Math.random() * moves.length)]
-    //     chess.move("wPe2-e4");
-    //     chess.move("bPe7-e5");
-    //     const w = chess.move("wNg1-f3");
-    //     chess.move("bNb8-c6");
-    //     chess.move("wPd2-d4");
-    //     chess.move("bPe5-d4");
-    //     chess.move("wPe4-e5");
-    //     chess.move("bPd7-d5");
-    //     const q = chess.move("wPe5-d6");
-    //     chess.move("bQd8-h4")
-    //     chess.move("wPd6-d7")
-    //     chess.move("bKe8-e7")
-    //     const k = chess.move("wPd7-d8")
-    //     console.log(w)
-    //     console.log(q)
-    //     console.log(k)
+    //     // chess.move("wPe2-e4");
+    //     // chess.move("bPe7-e5");
+    //     // const w = chess.move("wNg1-f3");
+    //     // chess.move("bNb8-c6");
+    //     // chess.move("wPd2-d4");
+    //     // chess.move("bPe5-d4");
+    //     // chess.move("wPe4-e5");
+    //     // chess.move("bPd7-d5");
+    //     // const q = chess.move("wPe5-d6");
+    //     // chess.move("bQd8-h4")
+    //     // chess.move("wPd6-d7")
+    //     // chess.move("bKe8-e7")
+    //     // const k = chess.move("wPd7-d8")
+    //     // console.log(w)
+    //     // console.log(q)
+    //     // console.log(k)
     //     // if(q.san == "O-O")
     //     // {
     //     //     console.log("hi")
     //     // }
     // // }
-    // console.log(chess.pgn())
+    // // console.log(typeof(chess.pgn()))
+    // console.log(typeof(chess.moveNumber()))
 
 
 
@@ -73,8 +74,8 @@ io.on("connection", (socket) => {
             const moveConfirm = chess.move(move);
             if(moveConfirm.san == "O-O" || moveConfirm.san == "O-O-O" || moveConfirm.flags == "e")
             {
-                io.to(socket.id).emit("castle:enpassant",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, newnewPos: moveConfirm.after})
-                io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos })
+                io.to(socket.id).emit("castle:enpassant",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, newnewPos: moveConfirm.after, pgn: chess.pgn()})
+                io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, pgn: chess.pgn() })
             }
             // else if(moveConfirm.san == "O-O-O")
             // {
@@ -118,17 +119,19 @@ io.on("connection", (socket) => {
                         gameStatus = "Stalemate"
                     }
 
-                    io.to(to).emit("opponent:move:gameend",{from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, gameStatus: gameStatus})
+                    io.to(to).emit("opponent:move:gameend",{from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, gameStatus: gameStatus, pgn: chess.pgn()})
                     io.to(socket.id).emit("gameend", {gameStatus: gameStatus})
+                    io.to(socket.id).emit("updatePgn", {pgn: chess.pgn()})
                 }
                 else
                 {
-                    io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos })
+                    io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, pgn: chess.pgn() })
+                    io.to(socket.id).emit("updatePgn", {pgn: chess.pgn()})
                 }
             }
         } catch (error) {
             console.log("hi Error: ",error);
-            io.to(socket.id).emit("invalid:move",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos})
+            io.to(socket.id).emit("invalid:move",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, pgn: chess.pgn()})
         }
         // console.log(move);
         // const chess = roomIdToChessGame.get(socketIdToRoomId.get(socket.id));
@@ -171,7 +174,7 @@ io.on("connection", (socket) => {
         chess.undo();
         try {
             const moveConfirm = chess.move(move);
-            io.to(socket.id).emit("castle:enpassant", {newnewPos: moveConfirm.after})
+            io.to(socket.id).emit("castle:enpassant", {newnewPos: moveConfirm.after, pgn: chess.pgn()})
             console.log("helllo wokring1")
             if(chess.isGameOver())
             {
@@ -189,18 +192,94 @@ io.on("connection", (socket) => {
                     gameStatus = "Stalemate"
                 }
                 console.log("helllo wokring2")
-                io.to(to).emit("opponent:move:gameend",{from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, gameStatus: gameStatus})
+                io.to(to).emit("opponent:move:gameend",{from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, gameStatus: gameStatus, pgn: chess.pgn()})
                 io.to(socket.id).emit("gameend", {gameStatus: gameStatus})
+                io.to(socket.id).emit("updatePgn", {pgn: chess.pgn()})
             }
             else
             {
                 console.log("helllo wokring3",moveConfirm.after)
                 console.log(to)
-                io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos })
+                io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, pgn: chess.pgn() })
+                io.to(socket.id).emit("updatePgn", {pgn: chess.pgn()})
             }
         } catch (error) {
             console.log("hi Error: ",error);
-            io.to(socket.id).emit("invalid:move",{source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos})
+            io.to(socket.id).emit("invalid:move",{source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, pgn: chess.pgn()})
         }
+    })
+
+    socket.on("userResign", ({to}) => {
+        const chess = roomIdToChessGame.get(socketIdToRoomId.get(socket.id));
+        currPos = chess.fen();
+        gameStatus = "Resign"
+        io.to(to).emit("opponent:move:gameend",{from: socket.id, newPos: currPos, gameStatus: gameStatus, pgn: chess.pgn()})
+        io.to(socket.id).emit("gameend", {gameStatus: gameStatus})
+    })
+
+    socket.on("userRequestDraw", ({to}) => {
+        io.to(to).emit("opponentRequestDraw",{from: socket.id})
+    })
+
+    socket.on("userAcceptDraw", ({to}) => {
+        const chess = roomIdToChessGame.get(socketIdToRoomId.get(socket.id));
+        currPos = chess.fen();
+        gameStatus = "Draw"
+        io.to(to).emit("opponent:move:gameend",{from: socket.id, newPos: currPos, gameStatus: gameStatus, pgn: chess.pgn()})
+        io.to(socket.id).emit("gameend", {gameStatus: gameStatus})
+    })
+
+    socket.on("userRejectDraw", ({to}) => {
+        io.to(to).emit("opponentRejectDraw",{from: socket.id})
+    })
+
+    socket.on("userRequestUndo", ({to, orientation}) => {
+        const chess = roomIdToChessGame.get(socketIdToRoomId.get(socket.id));
+        let side = "w";
+        if (orientation == "white")
+        {
+            side = "b";
+        }
+
+        if(chess.moveNumber() == 1)
+        {
+            console.log("hihi1")
+            if(chess.turn() == "w")
+            {
+                console.log("hooh2")
+                io.to(socket.id).emit("cantUndo")
+            }
+            else if(chess.turn() != side)
+            {
+                io.to(socket.id).emit("cantUndo")
+            }
+        }
+        else
+        {
+            io.to(to).emit("opponentRequestUndo",{from: socket.id})
+        }
+    })
+
+    socket.on("userAcceptUndo", ({to, orientation}) => {
+        const chess = roomIdToChessGame.get(socketIdToRoomId.get(socket.id));
+        let side = "w";
+        if (orientation == "white")
+        {
+            side = "b";
+        }
+        {
+            chess.undo();
+            if(chess.turn() != side)
+            {
+                chess.undo();
+            }
+            currPos = chess.fen();
+            io.to(to).emit("opponentAcceptUndo",{from: socket.id, newPos: currPos, pgn: chess.pgn()})
+            io.to(socket.id).emit("youAcceptUndo", {newPos: currPos, pgn: chess.pgn()})
+        }
+    })
+
+    socket.on("userRejectUndo", ({to}) => {
+        io.to(to).emit("opponentRejectUndo",{from: socket.id})
     })
 })

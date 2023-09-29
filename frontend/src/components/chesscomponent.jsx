@@ -13,6 +13,7 @@ const ChessboardComponent = () => {
   const [winner, setWinner] = useState("")
   const [result, setResult] = useState("")
   const [pgn, setPgn] = useState("")
+  const [isCheck, setIsCheck] = useState(false)
   // const [isCastle, setIsCastle] = useState(false)
   // const [isLongCastle, setIsLongCastle] = useState(false)
 
@@ -75,6 +76,7 @@ const ChessboardComponent = () => {
       console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
       setPosition(newPos);
       setAllowMyself(false);
+      setIsCheck(false)
 
       socket.emit("user:move", { to: remoteSocketId, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos })
     }
@@ -157,11 +159,12 @@ const ChessboardComponent = () => {
   )
 
   const handleOpponentMove = useCallback(
-    ({ from, source, target, piece, newPos, oldPos, pgn }) => {
+    ({ from, source, target, piece, newPos, oldPos, pgn, inCheck }) => {
       // console.log("psjkdnjksd",newPos);
       // board.position(newPos)
       setPgn(pgn)
       setPosition(newPos)
+      setIsCheck(inCheck)
       setAllowMyself(true)
     },
     [],
@@ -213,11 +216,12 @@ const ChessboardComponent = () => {
   )
 
   const handleInvalidMove = useCallback(
-    ({source, target, piece, newPos, oldPos, pgn}) => {
+    ({source, target, piece, newPos, oldPos, pgn, inCheck}) => {
       // board.position(newPos)
       alert("Invalid Move");
       setPgn(pgn)
       setPosition(oldPos)
+      setIsCheck(inCheck)
       setAllowMyself(true)
     },
     [],
@@ -320,9 +324,10 @@ const ChessboardComponent = () => {
   )
 
   const handleOpponentAcceptUndo = useCallback(
-    ({from, newPos, pgn}) => {
+    ({from, newPos, pgn, inCheck}) => {
       setPgn(pgn)
       setPosition(newPos);
+      setIsCheck(inCheck)
       setAllowMyself(true);
     },
     [],
@@ -413,6 +418,7 @@ const ChessboardComponent = () => {
       <button disabled={gameOver} onClick={handleResign}>Resign</button>
       {/* <p>{allowMyself ? "Your Turn" : (gameOver? "" : "Waiting for opponent")}</p> */}
       <p>{allowMyself ? <b style={{color:"green"}}>Your Turn</b> : (gameOver ? <p></p> : <b>Waiting for opponent</b>)}</p>
+      <p>{isCheck? <b style={{color:"red"}}>Check</b> : ""}</p>
       <p>{gameOver? "Game Over" : ""}</p>
       <p>{winner}  {result}</p>
       <p>{pgn}</p>

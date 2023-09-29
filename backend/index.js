@@ -75,7 +75,7 @@ io.on("connection", (socket) => {
             if(moveConfirm.san == "O-O" || moveConfirm.san == "O-O-O" || moveConfirm.flags == "e")
             {
                 io.to(socket.id).emit("castle:enpassant",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, newnewPos: moveConfirm.after, pgn: chess.pgn()})
-                io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, pgn: chess.pgn() })
+                io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, pgn: chess.pgn(), inCheck: chess.inCheck() })
             }
             // else if(moveConfirm.san == "O-O-O")
             // {
@@ -125,13 +125,13 @@ io.on("connection", (socket) => {
                 }
                 else
                 {
-                    io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, pgn: chess.pgn() })
+                    io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, pgn: chess.pgn(), inCheck: chess.inCheck() })
                     io.to(socket.id).emit("updatePgn", {pgn: chess.pgn()})
                 }
             }
         } catch (error) {
             console.log("hi Error: ",error);
-            io.to(socket.id).emit("invalid:move",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, pgn: chess.pgn()})
+            io.to(socket.id).emit("invalid:move",{source: source, target: target, piece: piece, newPos: newPos, oldPos: oldPos, pgn: chess.pgn(), inCheck: chess.inCheck()})
         }
         // console.log(move);
         // const chess = roomIdToChessGame.get(socketIdToRoomId.get(socket.id));
@@ -200,12 +200,12 @@ io.on("connection", (socket) => {
             {
                 console.log("helllo wokring3",moveConfirm.after)
                 console.log(to)
-                io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, pgn: chess.pgn() })
+                io.to(to).emit("opponent:move", { from: socket.id, source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, pgn: chess.pgn(), inCheck: chess.inCheck() })
                 io.to(socket.id).emit("updatePgn", {pgn: chess.pgn()})
             }
         } catch (error) {
             console.log("hi Error: ",error);
-            io.to(socket.id).emit("invalid:move",{source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, pgn: chess.pgn()})
+            io.to(socket.id).emit("invalid:move",{source: source, target: target, piece: piece, newPos: moveConfirm.after, oldPos: oldPos, pgn: chess.pgn(), inCheck: chess.inCheck()})
         }
     })
 
@@ -274,7 +274,7 @@ io.on("connection", (socket) => {
                 chess.undo();
             }
             currPos = chess.fen();
-            io.to(to).emit("opponentAcceptUndo",{from: socket.id, newPos: currPos, pgn: chess.pgn()})
+            io.to(to).emit("opponentAcceptUndo",{from: socket.id, newPos: currPos, pgn: chess.pgn(), inCheck: chess.inCheck()})
             io.to(socket.id).emit("youAcceptUndo", {newPos: currPos, pgn: chess.pgn()})
         }
     })

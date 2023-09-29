@@ -23,11 +23,13 @@ const LandingPage = () => {
                 <p>Enter Username</p>
                 <input type="text"
                     value={username}
+                    required
                     onChange={(e) => setusername(e.target.value)} />
                 <br></br>
                 <p>Enter RoomID</p>
                 <input type="text"
                     value={roomId}
+                    required
                     onChange={(e) => setRoomId(e.target.value)} />
                 <br></br>
                 <button type="submit">Submit</button>

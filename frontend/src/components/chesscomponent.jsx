@@ -14,6 +14,7 @@ const ChessboardComponent = () => {
   const [result, setResult] = useState("")
   const [pgn, setPgn] = useState("")
   const [isCheck, setIsCheck] = useState(false)
+  const [gameStart, setGameStart] = useState(false)
   // const [isCastle, setIsCastle] = useState(false)
   // const [isLongCastle, setIsLongCastle] = useState(false)
 
@@ -147,6 +148,7 @@ const ChessboardComponent = () => {
     setRemotesocketId(id);
     setRemoteUsername(username);
     setAllowMyself(true);
+    setGameStart(true);
   }, [socket]);
 
   const handleInRoomUser = useCallback(
@@ -154,6 +156,7 @@ const ChessboardComponent = () => {
       setRemotesocketId(id);
       setRemoteUsername(user);
       setOrientation("black")
+      setGameStart(true);
     },
     [],
   )
@@ -425,9 +428,9 @@ const ChessboardComponent = () => {
       <p/>
       <div ref={boardRef} style={{ margin: "auto", padding: "10px", width: "400px"}}></div>
       <p/>
-      <button disabled={gameOver} onClick={handleRequestUndo}>Undo</button>
-      <button disabled={gameOver} onClick={handleRequestDraw}>Request for a Draw</button>
-      <button disabled={gameOver} onClick={handleResign}>Resign</button>
+      <button disabled={gameOver || !gameStart} onClick={handleRequestUndo}>Undo</button>
+      <button disabled={gameOver || !gameStart} onClick={handleRequestDraw}>Request for a Draw</button>
+      <button disabled={gameOver || !gameStart} onClick={handleResign}>Resign</button>
       {/* <p>{allowMyself ? "Your Turn" : (gameOver? "" : "Waiting for opponent")}</p> */}
       <p>{allowMyself ? <b style={{color:"green"}}>Your Turn</b> : (gameOver ? <p></p> : <b>Waiting for opponent</b>)}</p>
       <p>{isCheck? <b style={{color:"red"}}>Check</b> : ""}</p>

@@ -362,6 +362,16 @@ const ChessboardComponent = () => {
     [],
   )
 
+  const handleOpponentLeft = useCallback(
+    () => {
+      alert("Opponent left the game")
+      setGameOver(true);
+      setAllowMyself(false);
+      setWinner("You win")
+      setResult("Resign")
+    },
+    [],
+  )
 
   useEffect(() => {
     socket.on("newUserJoined", handleUserJoined)
@@ -383,6 +393,7 @@ const ChessboardComponent = () => {
     socket.on("opponentRejectUndo", handleOpponentRejectUndo);
     socket.on("updatePgn", handleUpdatePgn);
     socket.on("cantUndo", handleCantUndo);
+    socket.on("opponentLeft", handleOpponentLeft);
     return () => {
       socket.off("newUserJoined", handleUserJoined)
       socket.off("user:inroom", handleInRoomUser);
@@ -403,10 +414,11 @@ const ChessboardComponent = () => {
       socket.off("opponentRejectUndo", handleOpponentRejectUndo);
       socket.off("updatePgn", handleUpdatePgn);
       socket.off("cantUndo", handleCantUndo);
+      socket.off("opponentLeft", handleOpponentLeft);
     }
   }, [handleUserJoined, handleInRoomUser, handleOpponentMove,handleOpponentGameEnd, handleGameEnd, handleInvalidMove, handleCastleEnpassant, 
     handleAskPromotionPiece, handleOpponentReqDraw, handleOpponentRejectDraw, handleOpponentReqUndo, handleOpponentAcceptUndo, handleYouAcceptUndo, 
-    handleOpponentRejectUndo, handleUpdatePgn, handleCantUndo])
+    handleOpponentRejectUndo, handleUpdatePgn, handleCantUndo, handleOpponentLeft])
   return (
     <div>
       <b>Oppponent: {remoteUsername}</b>

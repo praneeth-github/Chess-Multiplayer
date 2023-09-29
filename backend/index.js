@@ -282,4 +282,8 @@ io.on("connection", (socket) => {
     socket.on("userRejectUndo", ({to}) => {
         io.to(to).emit("opponentRejectUndo",{from: socket.id})
     })
+
+    socket.on("disconnect", () => {
+        io.to(socketIdToRoomId.get(socket.id)).emit("opponentLeft")
+    })
 })

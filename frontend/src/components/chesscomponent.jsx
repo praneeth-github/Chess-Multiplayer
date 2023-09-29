@@ -306,7 +306,7 @@ const ChessboardComponent = () => {
       socket.emit("userRequestUndo", {to: remoteSocketId, orientation: orientation})
       alert("Request for Undo sent")
     },
-    [remoteSocketId],
+    [remoteSocketId, orientation],
   )
 
   const handleOpponentReqUndo = useCallback(
@@ -320,7 +320,7 @@ const ChessboardComponent = () => {
         socket.emit("userRejectUndo", {to: remoteSocketId})
       }
     },
-    [remoteSocketId],
+    [remoteSocketId, orientation],
   )
 
   const handleOpponentAcceptUndo = useCallback(

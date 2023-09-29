@@ -253,6 +253,10 @@ io.on("connection", (socket) => {
             {
                 io.to(socket.id).emit("cantUndo")
             }
+            else
+            {
+                io.to(to).emit("opponentRequestUndo",{from: socket.id})
+            }
         }
         else
         {

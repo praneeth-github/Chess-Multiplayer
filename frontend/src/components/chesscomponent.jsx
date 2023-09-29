@@ -412,7 +412,7 @@ const ChessboardComponent = () => {
       <button disabled={gameOver} onClick={handleRequestDraw}>Request for a Draw</button>
       <button disabled={gameOver} onClick={handleResign}>Resign</button>
       {/* <p>{allowMyself ? "Your Turn" : (gameOver? "" : "Waiting for opponent")}</p> */}
-      {allowMyself ? <b style={{color:"green"}}>Your Turn</b> : (gameOver ? <p></p> : <b>Waiting for opponent</b>)}
+      <p>{allowMyself ? <b style={{color:"green"}}>Your Turn</b> : (gameOver ? <p></p> : <b>Waiting for opponent</b>)}</p>
       <p>{gameOver? "Game Over" : ""}</p>
       <p>{winner}  {result}</p>
       <p>{pgn}</p>
